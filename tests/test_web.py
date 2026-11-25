@@ -108,3 +108,24 @@ def test_manual_pdf_tiene_como_maximo_tres_paginas(cliente):
     paginas = len(re.findall(rb"/Type\s*/Page(?![s\w])", pdf.read_bytes()))
     assert 1 <= paginas <= 3
     assert cliente.get("/manual.pdf").mimetype == "application/pdf"
+
+
+@pytest.mark.parametrize("ruta", ["/captura", "/captura/ajuste", "/restaurar"])
+@pytest.mark.parametrize("cabeceras", [{"Origin": "http://sitio-ajeno.example"}, {"Origin": "null"},
+                                       {"Referer": "http://sitio-ajeno.example/pagina"}])
+def test_rechaza_formularios_enviados_desde_otro_sitio(cliente, ruta, cabeceras):
+    cliente.post("/captura", data={"pestana": "2025", "b25_caja_bancos_debe": "1"}, follow_redirects=True)
+    antes = html(cliente, "/balance")
+    r = cliente.post(ruta, headers=cabeceras,
+                     data={"b25_caja_bancos_debe": "999", "cuenta": "caja_bancos", "saldo": "999"})
+    assert r.status_code == 403
+    assert html(cliente, "/balance") == antes
+
+
+def test_acepta_formularios_del_propio_sistema(cliente):
+    r = cliente.post("/restaurar", headers={"Origin": "http://localhost"})
+    assert r.status_code == 302
+
+
+def test_rechaza_nombres_de_host_ajenos(cliente):
+    assert cliente.get("/", headers={"Host": "sitio-ajeno.example"}).status_code == 400

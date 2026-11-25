@@ -2,9 +2,10 @@
 import json
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import markdown
-from flask import Flask, flash, redirect, render_template, request, send_file, url_for
+from flask import Flask, abort, flash, redirect, render_template, request, send_file, url_for
 
 from altamira import (ajustes, analisis, balanza, captura, catalogo, complementarios as comp, formato,
                       horizontal_vertical as hv, presentacion, razones, validaciones)
@@ -88,12 +89,22 @@ def secciones_captura(pestana, datos):
 
 def crear_app(ruta_actual=RUTA_ACTUAL, pruebas=False):
     app = Flask(__name__)
-    app.config.update(TESTING=pruebas, SECRET_KEY=os.urandom(24))
+    # solo nombres locales: evita que un dominio ajeno apunte al sistema (DNS rebinding)
+    app.config.update(TESTING=pruebas, SECRET_KEY=os.urandom(24), TRUSTED_HOSTS=["127.0.0.1", "localhost"])
     repo = Repositorio(RUTA_BASE, ruta_actual)
     publicado = json.loads(RUTA_PUBLICADO.read_text(encoding="utf-8"))
 
     app.jinja_env.filters.update(monto=formato.monto, usd=formato.usd, usd_accion=formato.usd_accion,
                                  pct=formato.porcentaje, medida=formato.medida)
+
+    @app.before_request
+    def rechazar_formularios_de_otro_sitio():
+        """Protección CSRF: los cambios solo se aceptan desde las pantallas del propio sistema."""
+        if request.method in ("GET", "HEAD", "OPTIONS"):
+            return
+        origen = request.headers.get("Origin") or request.headers.get("Referer")
+        if origen is not None and urlsplit(origen).netloc != request.host:
+            abort(403)
 
     def actual():
         return analisis.construir(repo.cargar())
