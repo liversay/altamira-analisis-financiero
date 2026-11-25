@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_macros.html" import estado, semaforo %}
+{% block titulo %}Balance general{% endblock %}
+{% block contenido %}
+<div class="columnas">
+  <aside class="panel">
+    <h1>Balance general</h1>
+    <div class="widget">
+      <p class="cifra">{{ a.balances[2025].total_activos|usd }}</p>
+      <p class="nota">Total activos al 31-12-2025</p>
+      {{ semaforo('verde' if a.balances[2025].cuadra else 'rojo') }}
+      <p class="nota">Activos {{ '=' if a.balances[2025].cuadra else '≠' }} Pasivos + Capital</p>
+    </div>
+    {% for anio in (2025, 2024) %}
+    {% set c = a.conciliacion_ur[anio] %}
+    <div class="widget">
+      <h3>Utilidades retenidas {{ anio }}</h3>
+      <dl class="cuadre">
+        <div><dt>Saldo al 1 de enero</dt><dd>{{ c.saldo_inicial|monto }}</dd></div>
+        <div><dt>(+) Utilidad neta</dt><dd>{{ c.utilidad_neta|monto }}</dd></div>
+        <div><dt>(−) Dividendos declarados</dt><dd>{{ (-c.dividendos)|monto }}</dd></div>
+        <div class="corte total"><dt>Saldo al 31 de diciembre</dt><dd>{{ c.saldo_final|monto }}</dd></div>
+      </dl>
+      <span class="semaforo {{ 'verde' if c.concilia else 'rojo' }}"><i></i>{{ 'Concilia' if c.concilia else 'No concilia' }}</span>
+    </div>
+    {% endfor %}
+  </aside>
+  <section class="panel ancho">
+    <h2>Comparativo al 31 de diciembre</h2>
+    {{ estado(grupos, [{'titulo': '2025', 'campo': 'v2025', 'formato': 'monto'}, {'titulo': '2024', 'campo': 'v2024', 'formato': 'monto'}], 'bg') }}
+  </section>
+</div>
+{% endblock %}

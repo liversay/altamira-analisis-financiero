@@ -1,0 +1,6 @@
+{
+  "resultados": {"ventas_netas": 8575000, "costo_ventas": 5573000, "utilidad_bruta": 3002000, "total_gastos_operacion": 2219000, "uaii": 783000, "uai": 611000, "isr": 152750, "utilidad_neta": 458250},
+  "balance": {"total_activo_circulante": 2805250, "activos_fijos_netos": 3730000, "total_activos": 6985250, "total_pasivo_circulante": 1559000, "total_pasivos": 3609000, "total_capital": 3376250, "total_pasivo_capital": 6985250},
+  "flujo": {"total_operacion": 734250, "total_inversion": -330000, "total_financiamiento": -277000, "cambio_neto": 127250, "caja_inicial": 310000, "caja_final": 437250, "flujo_libre": 227250},
+  "upa": 2.29
+}

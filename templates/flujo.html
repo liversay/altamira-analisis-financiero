@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icono, semaforo %}
+{% block titulo %}Flujo de efectivo {{ anio }}{% endblock %}
+{% block contenido %}
+{% set f = a.flujos[anio] %}
+<div class="columnas">
+  <aside class="panel">
+    <h1>Flujo de efectivo</h1>
+    <div class="segmentos">{% for y in (2025, 2024) %}<a href="{{ url_for('flujo_efectivo', anio=y) }}" {% if y == anio %}aria-current="page"{% endif %}>{{ y }}</a>{% endfor %}</div>
+    <div class="widget">
+      <p class="cifra {{ 'neg' if f.flujo_libre < 0 }}">{{ f.flujo_libre|usd }}</p>
+      <p class="nota">Flujo de efectivo libre {{ anio }}</p>
+      <dl class="cuadre">
+        <div><dt>Flujo de operación</dt><dd>{{ f.total_operacion|monto }}</dd></div>
+        <div><dt>(−) Compra de activos fijos</dt><dd>{{ (-f.compra_activos_fijos)|monto }}</dd></div>
+        <div><dt>(−) Dividendos pagados</dt><dd>{{ (-f.dividendos_pagados)|monto }}</dd></div>
+        <div class="corte total"><dt>Flujo libre</dt><dd>{{ f.flujo_libre|monto }}</dd></div>
+      </dl>
+    </div>
+    <div class="widget">
+      <h3>Conciliación con Caja y bancos</h3>
+      <dl class="cuadre">
+        <div><dt>Caja al inicio</dt><dd>{{ f.caja_inicial|monto }}</dd></div>
+        <div><dt>Cambio neto del flujo</dt><dd>{{ f.cambio_neto|monto }}</dd></div>
+        <div class="corte total"><dt>Caja según balance</dt><dd>{{ f.caja_final|monto }}</dd></div>
+        <div><dt>Diferencia</dt><dd>{{ f.diferencia|monto }}</dd></div>
+      </dl>
+      <span class="semaforo {{ 'verde' if f.concilia else 'rojo' }}"><i></i>{{ 'Concilia' if f.concilia else 'No concilia' }}</span>
+    </div>
+  </aside>
+  <section class="panel ancho">
+    <h2>Método indirecto · {{ anio }}</h2>
+    <div class="tabla-marco"><table class="estado">
+      <thead><tr><th>Concepto</th><th>US$</th></tr></thead>
+      {% for clave, titulo, total in [('operacion', 'Actividades de operación', 'Flujo neto de operación'), ('inversion', 'Actividades de inversión', 'Flujo neto de inversión'), ('financiamiento', 'Actividades de financiamiento', 'Flujo neto de financiamiento')] %}
+      <tbody class="grupo">
+        <tr class="fila-grupo"><th colspan="2"><button type="button" class="plegar" aria-expanded="true">{{ icono('chevron') }}<span>{{ titulo }}</span><b class="badge">{{ f[clave]|length }}</b></button></th></tr>
+        {% for r in f[clave] %}<tr class="fila-cuenta"><th scope="row">{{ r.concepto }}</th><td class="{{ 'neg' if r.monto < 0 }}">{{ r.monto|monto }}</td></tr>{% endfor %}
+        <tr class="fila-subtotal"><th scope="row">{{ total }}</th><td>{{ f['total_' ~ clave]|monto }}</td></tr>
+      </tbody>
+      {% endfor %}
+      <tbody>
+        <tr class="fila-subtotal"><th>Cambio neto en caja y bancos</th><td>{{ f.cambio_neto|monto }}</td></tr>
+        <tr class="fila-cuenta"><th>Caja y bancos al inicio ({{ anio - 1 }})</th><td>{{ f.caja_inicial|monto }}</td></tr>
+        <tr class="fila-total"><th>Caja y bancos al final ({{ anio }})</th><td>{{ (f.caja_inicial + f.cambio_neto)|monto }}</td></tr>
+      </tbody>
+    </table></div>
+    <p class="nota">La deuda a largo plazo se presenta como cambio neto (préstamo, bonos y porción corriente), porque los saldos no separan nuevos préstamos de abonos. Flujo libre = flujo de operación − compra de activos fijos − dividendos pagados.</p>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% from "_macros.html" import icono %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Inicio{% endblock %} · Altamira Análisis Financiero</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+</head>
+<body>
+<div class="app">
+  <nav class="riel" aria-label="Menú principal">
+    <a class="marca" href="/" aria-label="Menú principal" data-tip="Menú principal">{{ icono('inicio') }}</a>
+    {% for endpoint, numero, titulo, descripcion, ico in modulos %}
+    <a href="{{ url_for(endpoint) }}" data-tip="{{ titulo }}" aria-label="{{ titulo }}" {% if request.endpoint == endpoint %}aria-current="page"{% endif %}>{{ icono(ico) }}</a>
+    {% endfor %}
+    <a href="/manual" class="al-final" data-tip="Manual de uso" aria-label="Manual de uso" {% if request.endpoint == 'manual' %}aria-current="page"{% endif %}>{{ icono('manual') }}</a>
+  </nav>
+
+  <div class="lienzo">
+    <header class="cabecera">
+      <p>Empresa <strong>{{ empresa }}</strong></p>
+      <ul class="chips">
+        <li class="chip {{ 'bien' if cuadra else 'mal' }}">{{ icono('ok' if cuadra else 'alerta') }}{{ 'Balance cuadrado' if cuadra else 'Balance descuadrado' }}</li>
+        <li class="chip {{ 'bien' if validacion_ok else 'mal' }}">{{ icono('ok' if validacion_ok else 'alerta') }}{{ '2024 reproducido' if validacion_ok else '2024 no coincide' }}</li>
+        {% if modificado %}<li class="chip aviso">Datos modificados</li>{% endif %}
+        <li><button type="button" class="chip accion" onclick="window.print()">{{ icono('imprimir') }}Imprimir</button></li>
+      </ul>
+    </header>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+      {% for categoria, mensaje in mensajes %}<p class="mensaje {{ categoria }}" role="status">{{ mensaje }}</p>{% endfor %}
+    {% endwith %}
+
+    {% if alertas %}
+    <div class="alertas" role="alert">
+      {{ icono('alerta') }}
+      <ul>{% for al in alertas %}<li class="{{ al.nivel }}">{{ al.mensaje }}</li>{% endfor %}</ul>
+      <a class="boton" href="/captura">Revisar datos</a>
+    </div>
+    {% endif %}
+
+    <main>{% block contenido %}{% endblock %}</main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import estado, icono %}
+{% block titulo %}Análisis horizontal y vertical{% endblock %}
+{% block contenido %}
+<section class="panel">
+  <h1>Análisis horizontal y vertical</h1>
+  <div class="graficos">
+    <figure class="widget"><figcaption>Resultados 2024 y 2025 (US$)</figcaption><div class="lienzo-grafico"><canvas id="g-resultados"></canvas></div></figure>
+    <figure class="widget"><figcaption>Vertical del estado de resultados (% de ventas netas)</figcaption><div class="lienzo-grafico"><canvas id="g-margenes"></canvas></div></figure>
+    <figure class="widget"><figcaption>Estructura del activo (% del activo total)</figcaption><div class="lienzo-grafico"><canvas id="g-activos"></canvas></div></figure>
+    <figure class="widget"><figcaption>Estructura del financiamiento (% del activo total)</figcaption><div class="lienzo-grafico"><canvas id="g-financiamiento"></canvas></div></figure>
+  </div>
+</section>
+
+{% for titulo, grupos in horizontal.items() %}
+<section class="panel">
+  <h2>{{ titulo }}: horizontal</h2>
+  {{ estado(grupos, [{'titulo': '2024', 'campo': 'v2024', 'formato': 'monto'}, {'titulo': '2025', 'campo': 'v2025', 'formato': 'monto'}, {'titulo': 'Variación US$', 'campo': 'absoluta', 'formato': 'monto'}, {'titulo': 'Variación %', 'campo': 'porcentual', 'formato': 'pct'}], 'h-' ~ loop.index) }}
+  <h2>{{ titulo }}: vertical (% {{ 'de ventas netas' if loop.first else 'del activo total' }})</h2>
+  {{ estado(grupos, [{'titulo': '2024', 'campo': 'v2024', 'formato': 'monto'}, {'titulo': '% 2024', 'campo': 'pct2024', 'formato': 'pct'}, {'titulo': '2025', 'campo': 'v2025', 'formato': 'monto'}, {'titulo': '% 2025', 'campo': 'pct2025', 'formato': 'pct'}], 'v-' ~ loop.index) }}
+</section>
+{% endfor %}
+<script type="application/json" id="datos-graficos">{{ graficos|tojson }}</script>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
+{% endblock %}

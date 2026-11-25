@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icono, dial %}
+{% block contenido %}
+<div class="columnas">
+  <section class="panel">
+    <h1>Menú principal</h1>
+    <ul class="pildoras">
+      {% for endpoint, numero, titulo, descripcion, ico in modulos %}
+      <li><a href="{{ url_for(endpoint) }}">{{ icono(ico) }}<span><strong>{{ titulo }}</strong><small>{{ descripcion }}</small></span><b class="badge">{{ numero }}</b>{{ icono('chevron') }}</a></li>
+      {% endfor %}
+      <li><a href="/manual">{{ icono('manual') }}<span><strong>Manual de uso</strong><small>Guía de 3 páginas</small></span>{{ icono('chevron') }}</a></li>
+    </ul>
+  </section>
+
+  <section class="panel ancho">
+    <h2>Resumen 2025</h2>
+    <div class="widget widget-dial">
+      {{ dial(razones) }}
+      <div>
+        <p class="cifra">{{ a.resultados[2025].utilidad_neta|usd }}</p>
+        <p class="nota">Utilidad neta 2025 · en 2024 fue {{ a.resultados[2024].utilidad_neta|usd }}</p>
+        <ul class="leyenda">
+          <li><span class="semaforo verde"><i></i>{{ conteo.verde }} cumplen</span></li>
+          <li><span class="semaforo amarillo"><i></i>{{ conteo.amarillo }} cerca</span></li>
+          <li><span class="semaforo rojo"><i></i>{{ conteo.rojo }} en alerta</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <dl class="lista-datos">
+      <div><dt>Ventas netas</dt><dd>{{ a.resultados[2025].ventas_netas|usd }}</dd></div>
+      <div><dt>Utilidad por acción</dt><dd>{{ a.resultados[2025].upa|usd_accion }}</dd></div>
+      <div><dt>Total activos</dt><dd>{{ a.balances[2025].total_activos|usd }}</dd></div>
+      <div><dt>Flujo neto de operación</dt><dd>{{ a.flujos[2025].total_operacion|usd }}</dd></div>
+      <div><dt>Flujo de efectivo libre</dt><dd>{{ a.flujos[2025].flujo_libre|usd }}</dd></div>
+      <div><dt>Caja y bancos al cierre</dt><dd>{{ a.flujos[2025].caja_final|usd }}</dd></div>
+    </dl>
+
+    <details class="bloque" {% if not validacion_ok %}open{% endif %}>
+      <summary>{{ icono('chevron') }}Prueba de validación contra los estados 2024<b class="badge">{{ validacion|selectattr('ok')|list|length }}/{{ validacion|length }}</b></summary>
+      <div class="tabla-marco"><table>
+        <thead><tr><th>Concepto 2024</th><th>Publicado</th><th>Calculado</th><th>Resultado</th></tr></thead>
+        <tbody>{% for f in validacion %}
+          <tr><th scope="row">{{ conceptos[f.concepto] }}</th>
+          {% if f.concepto == 'upa' %}<td>{{ f.esperado|usd_accion }}</td><td>{{ f.obtenido|usd_accion }}</td>
+          {% else %}<td>{{ f.esperado|monto }}</td><td>{{ f.obtenido|monto }}</td>{% endif %}
+          <td><span class="semaforo {{ 'verde' if f.ok else 'rojo' }}"><i></i>{{ 'Coincide' if f.ok else 'Difiere' }}</span></td></tr>
+        {% endfor %}</tbody>
+      </table></div>
+    </details>
+  </section>
+</div>
+{% endblock %}

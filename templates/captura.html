@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icono %}
+{% block titulo %}Captura de datos{% endblock %}
+{% block contenido %}
+<div class="columnas">
+  <aside class="panel">
+    <h1>Captura de datos</h1>
+    <ul class="pildoras">
+      {% for clave, titulo in pestanas.items() %}
+      <li><a href="{{ url_for('captura_datos', pestana=clave) }}" {% if clave == pestana %}aria-current="page"{% endif %}><span><strong>{{ titulo }}</strong></span><b class="badge">{{ {'2025': datos.balanza_2025|length, '2024': datos.cuentas_2024|length, '2023': datos.cuentas_2023|length, 'complementarios': datos.complementarios|length + datos.industria|length}[clave] }}</b>{{ icono('chevron') }}</a></li>
+      {% endfor %}
+    </ul>
+
+    <div class="widget">
+      <h3>Cuadre 2025</h3>
+      <dl class="cuadre">
+        <div><dt>Total Debe</dt><dd>{{ totales[0]|monto }}</dd></div>
+        <div><dt>Total Haber</dt><dd>{{ totales[1]|monto }}</dd></div>
+        <div class="corte"><dt>Activos</dt><dd>{{ a.balances[2025].total_activos|monto }}</dd></div>
+        <div><dt>Pasivos + Capital</dt><dd>{{ a.balances[2025].total_pasivo_capital|monto }}</dd></div>
+        <div><dt>Diferencia</dt><dd>{{ a.balances[2025].diferencia|monto }}</dd></div>
+      </dl>
+      <span class="semaforo {{ 'verde' if a.balances[2025].cuadra and totales[0] == totales[1] else 'rojo' }}"><i></i>{{ 'Cuadra' if a.balances[2025].cuadra and totales[0] == totales[1] else 'No cuadra' }}</span>
+    </div>
+
+    <form method="post" action="/restaurar">
+      <button class="boton secundario" {% if not modificado %}disabled{% endif %}>Restaurar datos originales</button>
+    </form>
+  </aside>
+
+  <section class="panel ancho">
+    <h2>Modificar una cuenta 2025</h2>
+    <form method="post" action="/captura/ajuste" class="barra-ajuste">
+      <label>Cuenta
+        <select name="cuenta" id="ajuste-cuenta">
+          {% for c in cuentas %}<option value="{{ c.clave }}" data-saldo="{{ saldos[c.clave]|monto }}" {% if c.clave == 'cxc_comerciales' %}selected{% endif %}>{{ c.numero }}. {{ c.nombre }}</option>{% endfor %}
+        </select></label>
+      <label>Nuevo saldo (US$)
+        <input name="saldo" id="ajuste-saldo" inputmode="decimal" autocomplete="off" placeholder="Escriba y presione Enter" required>
+        <small id="ajuste-actual"></small></label>
+      <label>Contrapartida
+        <select name="contrapartida">
+          <option value="">Ninguna (solo esta cuenta)</option>
+          {% for c in cuentas %}<option value="{{ c.clave }}">{{ c.nombre }}</option>{% endfor %}
+        </select></label>
+      <button class="boton">{{ icono('mas') }}Aplicar</button>
+    </form>
+    <p class="nota">Con contrapartida se registra la partida doble y el ISR del periodo y por pagar se recalculan. Sin contrapartida el balance quedará descuadrado y verá la alerta.</p>
+
+    {% if cambios %}
+    <details class="bloque" open>
+      <summary>{{ icono('chevron') }}Razones que cambiaron respecto a los datos originales<b class="badge">{{ cambios|length }}</b></summary>
+      <div class="tabla-marco"><table>
+        <thead><tr><th>Razón 2025</th><th>Original</th><th>Actual</th><th>Dirección</th><th>Efecto</th></tr></thead>
+        <tbody>{% for c in cambios %}
+          <tr><th scope="row">{{ c.nombre }}<small>{{ c.formula }}</small></th>
+          <td>{{ c.antes|medida(c.unidad) }}</td><td>{{ c.despues|medida(c.unidad) }}</td>
+          <td>{{ '▲' if c.direccion == 'sube' else '▼' }} {{ c.direccion|capitalize }}</td>
+          <td><span class="semaforo {{ 'verde' if c.efecto == 'mejora' else 'rojo' if c.efecto == 'empeora' else 'gris' }}"><i></i>{{ c.efecto|capitalize }}</span></td></tr>
+        {% endfor %}</tbody>
+      </table></div>
+    </details>
+    {% endif %}
+
+    <h2>{{ pestanas[pestana] }}</h2>
+    <form method="post" action="/captura" class="captura">
+      <input type="hidden" name="pestana" value="{{ pestana }}">
+      <button type="submit" class="oculto" tabindex="-1" aria-hidden="true">Guardar</button>
+
+      {% for g in grupos %}
+      <details class="bloque" {% if loop.first or pestana != '2025' %}open{% endif %}>
+        <summary>{{ icono('chevron') }}{{ g.titulo }}<b class="badge">{{ g.filas|length }}</b></summary>
+        <div class="tabla-marco"><table class="entrada">
+          <thead><tr><th>Cuenta</th>{% if pestana == '2025' %}<th>Debe</th><th>Haber</th>{% else %}<th>Saldo {{ pestana }}</th>{% endif %}</tr></thead>
+          <tbody>{% for f in g.filas %}
+            <tr><th scope="row"><span class="num">{{ f.numero }}</span>{{ f.nombre }}</th>
+            {% if pestana == '2025' %}
+              {% for lado in ('debe', 'haber') %}<td><input name="b25_{{ f.clave }}_{{ lado }}" value="{{ f[lado]|monto }}" inputmode="decimal" aria-label="{{ f.nombre }} ({{ lado }})" class="{{ 'natural' if (f.naturaleza == 'deudora') == (lado == 'debe') else 'contraria' }}"></td>{% endfor %}
+            {% else %}
+              <td><input name="c{{ pestana[2:] }}_{{ f.clave }}" value="{{ f.valor|monto }}" inputmode="decimal" aria-label="{{ f.nombre }} {{ pestana }}"></td>
+            {% endif %}</tr>
+          {% endfor %}</tbody>
+        </table></div>
+      </details>
+      {% endfor %}
+
+      {% if pestana == 'complementarios' %}
+      <details class="bloque" open>
+        <summary>{{ icono('chevron') }}Datos complementarios<b class="badge">{{ datos.complementarios|length }}</b></summary>
+        <div class="campos">{% for clave, valor in datos.complementarios.items() %}
+          <label>{{ etiquetas[clave] }}<input name="comp_{{ clave }}" value="{{ valor|monto }}" inputmode="decimal"></label>{% endfor %}
+        </div>
+      </details>
+      <details class="bloque" open>
+        <summary>{{ icono('chevron') }}Promedios de la industria<b class="badge">{{ datos.industria|length }}</b></summary>
+        <div class="campos">{% for d in definiciones %}
+          <label>{{ d.nombre }} ({{ {'porcentaje': '%', 'veces': 'veces', 'dias': 'días'}[d.unidad] }})<input name="ind_{{ d.clave }}" value="{{ datos.industria[d.clave] }}" inputmode="decimal"></label>{% endfor %}
+        </div>
+      </details>
+      {% endif %}
+
+      <div class="barra-guardar"><span>Los cambios se aplican a todos los módulos al guardar.</span><button class="boton">Guardar y recalcular</button></div>
+    </form>
+  </section>
+</div>
+{% endblock %}

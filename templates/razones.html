@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icono, semaforo, dial %}
+{% block titulo %}Razones financieras{% endblock %}
+{% block contenido %}
+<div class="columnas">
+  <aside class="panel">
+    <h1>Razones financieras</h1>
+    <div class="widget centrado">{{ dial(filas) }}<p class="nota">Cada marca es una razón de 2025</p></div>
+    <ul class="pildoras">
+      {% for clave, titulo in categorias.items() %}
+      <li><a href="#{{ clave }}"><span><strong>{{ titulo }}</strong></span><b class="badge">{{ filas|selectattr('categoria', 'equalto', clave)|list|length }}</b>{{ icono('chevron') }}</a></li>
+      {% endfor %}
+      <li><a href="#dupont"><span><strong>Sistema Du Pont</strong></span>{{ icono('chevron') }}</a></li>
+    </ul>
+    <p class="nota">Cumple: igual o mejor que la industria. Cerca: hasta 10 % peor. Alerta: más de 10 % peor. Saldos de fin de año y año de {{ a.datos.complementarios.dias_anio }} días.</p>
+  </aside>
+
+  <section class="panel ancho">
+    {% for clave, titulo in categorias.items() %}
+    <article class="categoria" id="{{ clave }}">
+      <h2>{{ titulo }}</h2>
+      <div class="tabla-marco"><table class="razones">
+        <thead><tr><th>Razón</th><th>2024</th><th>2025</th><th>Industria</th><th>Comparación</th></tr></thead>
+        <tbody>
+        {% for f in filas if f.categoria == clave %}
+        {% set tope = [f.valor_2024 or 0, f.valor_2025 or 0, f.industria, 0.0001]|max %}
+        <tr>
+          <th scope="row">{{ f.numero }}. {{ f.nombre }}<small>{{ f.formula }}</small></th>
+          <td>{{ f.valor_2024|medida(f.unidad) }}{{ semaforo(f.semaforo_2024) }}</td>
+          <td class="fuerte">{{ f.valor_2025|medida(f.unidad) }}{{ semaforo(f.semaforo_2025) }}</td>
+          <td>{{ f.industria|medida(f.unidad) }}</td>
+          <td class="barras" aria-hidden="true">
+            <span style="--ancho: {{ ([f.valor_2024 or 0, 0]|max) / tope * 100 }}%" class="b24"></span>
+            <span style="--ancho: {{ ([f.valor_2025 or 0, 0]|max) / tope * 100 }}%" class="b25"></span>
+            <i style="--r: {{ f.industria / tope }}"></i>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+      <p class="comentario">{{ comentarios[clave] }}</p>
+    </article>
+    {% endfor %}
+    <p class="leyenda-barras"><span class="m24"></span>2024 <span class="m25"></span>2025 <span class="mind"></span>Promedio de la industria</p>
+
+    <article class="categoria" id="dupont">
+      <h2>Sistema Du Pont</h2>
+      {% for anio in (2025, 2024) %}
+      {% set d = dupont[anio] %}
+      <h3>{{ anio }}</h3>
+      <div class="dupont">
+        <div><small>Margen de utilidad</small><strong>{{ d.margen|pct }}</strong></div><b>×</b>
+        <div><small>Rotación de activos</small><strong>{{ d.rotacion|medida('veces') }}</strong></div><b>=</b>
+        <div class="resultado"><small>ROA</small><strong>{{ d.roa|pct }}</strong></div><b>÷</b>
+        <div><small>1 − Deudas/Activos</small><strong>1 − {{ d.deuda_activos|pct }}</strong></div><b>=</b>
+        <div class="resultado"><small>ROE</small><strong>{{ d.roe|pct }}</strong></div>
+      </div>
+      {% endfor %}
+    </article>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block titulo %}Manual de uso{% endblock %}
+{% block contenido %}
+<section class="panel manual">
+  <a class="boton" href="/manual.pdf">Descargar en PDF</a>
+  <article>{{ contenido|safe }}</article>
+</section>
+{% endblock %}

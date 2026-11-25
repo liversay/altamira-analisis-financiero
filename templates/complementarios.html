@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block titulo %}Indicadores complementarios{% endblock %}
+{% block contenido %}
+<section class="panel">
+  <h1>Indicadores complementarios</h1>
+  <div class="rejilla">
+
+    <article class="widget">
+      <h2>a. Escudo fiscal de la depreciación</h2>
+      <p class="cifra">{{ escudo.escudo|usd }}</p>
+      <p class="nota">Impuesto ahorrado en 2025: ({{ escudo.depreciacion|monto }} + {{ escudo.amortizacion|monto }}) × {{ "%g"|format(escudo.tasa) }} %</p>
+      <div class="tabla-marco"><table>
+        <thead><tr><th></th><th>Real</th><th>Sin depreciación ni amortización</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Utilidad neta</th><td>{{ escudo.utilidad_neta|monto }}</td><td>{{ escudo.utilidad_neta_sin|monto }}</td></tr>
+          <tr><th scope="row">Flujo de operación</th><td>{{ escudo.flujo_operacion|monto }}</td><td>{{ escudo.flujo_operacion_sin|monto }}</td></tr>
+        </tbody>
+      </table></div>
+      <p class="comentario">Sin esos gastos la utilidad contable sería mayor, pero el efectivo de operación sería menor en {{ escudo.escudo|usd }}: no son salidas de efectivo y reducen el impuesto.</p>
+    </article>
+
+    <article class="widget">
+      <h2>b. Costo de los gastos después de impuestos</h2>
+      <div class="tabla-marco"><table>
+        <thead><tr><th>2025</th><th>Antes de ISR</th><th>Ahorro fiscal</th><th>Después de ISR</th></tr></thead>
+        <tbody>{% for f in costo.filas %}<tr><th scope="row">{{ f.concepto }}</th><td>{{ f.antes|monto }}</td><td>{{ f.ahorro|monto }}</td><td>{{ f.despues|monto }}</td></tr>{% endfor %}
+        <tr class="fila-total"><th scope="row">Total</th><td>{{ costo.total.antes|monto }}</td><td>{{ costo.total.ahorro|monto }}</td><td>{{ costo.total.despues|monto }}</td></tr></tbody>
+      </table></div>
+      <p class="comentario">Costo neto = gasto × (1 − {{ "%g"|format(costo.tasa) }} %).</p>
+    </article>
+
+    <article class="widget">
+      <h2>c. Valor en libros por acción y P/U</h2>
+      <div class="tabla-marco"><table>
+        <thead><tr><th>Por acción</th><th>2024</th><th>2025</th></tr></thead>
+        <tbody>
+          {% for etiqueta, clave in [('Valor en libros', 'valor_libros'), ('Utilidad por acción', 'upa'), ('Dividendo por acción', 'dividendo')] %}
+          <tr><th scope="row">{{ etiqueta }}</th><td>{{ acciones[2024][clave]|usd_accion }}</td><td>{{ acciones[2025][clave]|usd_accion }}</td></tr>{% endfor %}
+          <tr><th scope="row">Razón de pago (dividendo ÷ UPA)</th><td>{{ acciones[2024].razon_pago|pct }}</td><td>{{ acciones[2025].razon_pago|pct }}</td></tr>
+          <tr><th scope="row">Relación precio-utilidad (P/U)</th>{% for y in (2024, 2025) %}<td>{{ acciones[y].precio_utilidad|medida('veces') }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Precio ÷ valor en libros</th>{% for y in (2024, 2025) %}<td>{{ acciones[y].precio_valor_libros|medida('veces') }}</td>{% endfor %}</tr>
+        </tbody>
+      </table></div>
+      {% if not a.datos.complementarios.precio_accion %}
+      <p class="comentario">La P/U necesita el precio de mercado de la acción, que no forma parte de los estados financieros. <a href="/captura?pestana=complementarios">Ingrese un precio</a> para calcularla (se aplica el mismo precio a ambos años).</p>
+      {% else %}<p class="comentario">Calculada con un precio de {{ a.datos.complementarios.precio_accion|usd_accion }} por acción en ambos años.</p>{% endif %}
+    </article>
+
+    <article class="widget">
+      <h2>d. Conciliación de ventas por producto</h2>
+      <div class="tabla-marco"><table>
+        <thead><tr><th>Producto</th><th>Unidades</th><th>Precio</th><th>Ventas US$</th><th>Participación</th></tr></thead>
+        <tbody>{% for p in ventas.productos %}<tr><th scope="row">{{ p.nombre }}</th><td>{{ p.unidades|monto }}</td><td>{{ p.precio|usd_accion }}</td><td>{{ p.ventas|monto }}</td><td>{{ p.participacion|pct }}</td></tr>{% endfor %}
+        <tr class="fila-total"><th scope="row">Total por producto</th><td></td><td></td><td>{{ ventas.total|monto }}</td><td>100.00 %</td></tr>
+        <tr><th scope="row">Ventas brutas de la balanza</th><td></td><td></td><td>{{ ventas.ventas_brutas|monto }}</td><td></td></tr></tbody>
+      </table></div>
+      {% for p in ventas.productos %}<div class="participacion"><span>{{ p.nombre }}</span><span class="pista"><span style="--ancho: {{ p.participacion or 0 }}%"></span></span><strong>{{ p.participacion|pct }}</strong></div>{% endfor %}
+      <span class="semaforo {{ 'verde' if ventas.concilia else 'rojo' }}"><i></i>{{ 'Concilia con la balanza' if ventas.concilia else 'No concilia: diferencia ' ~ ventas.diferencia|usd }}</span>
+    </article>
+
+    <article class="widget doble">
+      <h2>e. Utilidad neta vs. flujo de operación</h2>
+      <div class="tabla-marco"><table>
+        <thead><tr><th></th><th>2024</th><th>2025</th></tr></thead>
+        <tbody>
+        {% for etiqueta, clave in [('Utilidad neta', 'utilidad_neta'), ('Flujo neto de operación', 'flujo_operacion'), ('Diferencia (utilidad − flujo)', 'diferencia'), ('Gastos que no usan efectivo', 'no_efectivo'), ('Efecto del capital de trabajo', 'capital_trabajo')] %}
+        <tr><th scope="row">{{ etiqueta }}</th><td>{{ calidad[2024][clave]|monto }}</td><td>{{ calidad[2025][clave]|monto }}</td></tr>{% endfor %}
+        </tbody>
+      </table></div>
+      <div class="dos">
+        {% for y in (2024, 2025) %}
+        <div><h3>Tres partidas que más explican {{ y }}</h3>
+          <ol class="ranking">{% for p in calidad[y].principales %}<li><span>{{ p.concepto }}</span><strong>{{ p.monto|monto }}</strong></li>{% endfor %}</ol></div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="widget doble">
+      <h2>f. Du Pont descompuesto: variación del ROE</h2>
+      {% if dupont %}
+      <p class="cifra">{{ "%+.2f"|format(dupont.variacion) }} puntos</p>
+      <p class="nota">ROE {{ dupont.antes.roe|pct }} en 2024 → {{ dupont.despues.roe|pct }} en 2025</p>
+      <div class="tabla-marco"><table>
+        <thead><tr><th>Causa</th><th>2024</th><th>2025</th><th>Efecto en el ROE (puntos)</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Margen de utilidad</th><td>{{ dupont.antes.margen|pct }}</td><td>{{ dupont.despues.margen|pct }}</td><td>{{ "%+.2f"|format(dupont.efecto_margen) }}</td></tr>
+          <tr><th scope="row">Rotación de activos</th><td>{{ dupont.antes.rotacion|medida('veces') }}</td><td>{{ dupont.despues.rotacion|medida('veces') }}</td><td>{{ "%+.2f"|format(dupont.efecto_rotacion) }}</td></tr>
+          <tr><th scope="row">Endeudamiento (deudas/activos)</th><td>{{ dupont.antes.deuda_activos|pct }}</td><td>{{ dupont.despues.deuda_activos|pct }}</td><td>{{ "%+.2f"|format(dupont.efecto_endeudamiento) }}</td></tr>
+          <tr class="fila-total"><th scope="row">Variación total</th><td></td><td></td><td>{{ "%+.2f"|format(dupont.variacion) }}</td></tr>
+        </tbody>
+      </table></div>
+      <p class="comentario">Método de sustitución en cadena, en este orden: margen, rotación y endeudamiento. Los tres efectos suman exactamente la variación; con otro orden el reparto cambiaría ligeramente.</p>
+      {% else %}<p class="comentario">No se puede descomponer: algún denominador es cero.</p>{% endif %}
+    </article>
+
+    <article class="widget doble">
+      <h2>g. Costo de la política de crédito</h2>
+      <p class="cifra">{{ credito.efectivo_inmovilizado|usd }}</p>
+      <p class="nota">Efectivo adicional inmovilizado en cuentas por cobrar</p>
+      <dl class="lista-datos">
+        <div><dt>Periodo promedio de cobranza 2025</dt><dd>{{ credito.ppc|medida('dias') }}</dd></div>
+        <div><dt>Promedio de la industria</dt><dd>{{ credito.ppc_industria|medida('dias') }}</dd></div>
+        <div><dt>Días en exceso</dt><dd>{{ credito.dias_exceso|medida('dias') }}</dd></div>
+        <div><dt>Ventas netas diarias</dt><dd>{{ credito.ventas_diarias|usd }}</dd></div>
+      </dl>
+      <p class="comentario">(PPC real − PPC industria) × ventas netas diarias.</p>
+    </article>
+  </div>
+</section>
+{% endblock %}

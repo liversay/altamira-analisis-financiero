@@ -1,0 +1,312 @@
+{
+  "balanza_2025": {
+    "activos_intangibles": {
+      "debe": 410000,
+      "haber": 0
+    },
+    "amortizacion_acumulada": {
+      "debe": 0,
+      "haber": 194000
+    },
+    "arrendamientos": {
+      "debe": 156000,
+      "haber": 0
+    },
+    "bonos_por_pagar": {
+      "debe": 0,
+      "haber": 800000
+    },
+    "caja_bancos": {
+      "debe": 337750,
+      "haber": 0
+    },
+    "capital_comun": {
+      "debe": 0,
+      "haber": 1000000
+    },
+    "capital_pagado_exceso": {
+      "debe": 0,
+      "haber": 400000
+    },
+    "costo_materiales": {
+      "debe": 3910000,
+      "haber": 0
+    },
+    "costos_indirectos": {
+      "debe": 946000,
+      "haber": 0
+    },
+    "cxc_comerciales": {
+      "debe": 1335000,
+      "haber": 0
+    },
+    "cxp_proveedores": {
+      "debe": 0,
+      "haber": 780000
+    },
+    "depreciacion_acumulada": {
+      "debe": 0,
+      "haber": 2662000
+    },
+    "devoluciones_ventas": {
+      "debe": 229000,
+      "haber": 0
+    },
+    "dividendos_decretados": {
+      "debe": 83000,
+      "haber": 0
+    },
+    "dividendos_por_pagar": {
+      "debe": 0,
+      "haber": 40000
+    },
+    "documentos_por_pagar": {
+      "debe": 0,
+      "haber": 520000
+    },
+    "edificios": {
+      "debe": 1800000,
+      "haber": 0
+    },
+    "equipo_transporte": {
+      "debe": 600000,
+      "haber": 0
+    },
+    "estimacion_incobrables": {
+      "debe": 0,
+      "haber": 40000
+    },
+    "fletes_distribucion": {
+      "debe": 248000,
+      "haber": 0
+    },
+    "gasto_amortizacion": {
+      "debe": 44000,
+      "haber": 0
+    },
+    "gasto_depreciacion": {
+      "debe": 382000,
+      "haber": 0
+    },
+    "gastos_acumulados": {
+      "debe": 0,
+      "haber": 214000
+    },
+    "gastos_anticipados": {
+      "debe": 72000,
+      "haber": 0
+    },
+    "gastos_intereses": {
+      "debe": 214000,
+      "haber": 0
+    },
+    "honorarios_profesionales": {
+      "debe": 61000,
+      "haber": 0
+    },
+    "isr_periodo": {
+      "debe": 69500,
+      "haber": 0
+    },
+    "isr_por_pagar": {
+      "debe": 0,
+      "haber": 88000
+    },
+    "ingresos_financieros": {
+      "debe": 0,
+      "haber": 12000
+    },
+    "inv_materia_prima": {
+      "debe": 540000,
+      "haber": 0
+    },
+    "inv_en_proceso": {
+      "debe": 165000,
+      "haber": 0
+    },
+    "inv_terminados": {
+      "debe": 735000,
+      "haber": 0
+    },
+    "inversiones_lp": {
+      "debe": 250000,
+      "haber": 0
+    },
+    "mano_obra_directa": {
+      "debe": 1415000,
+      "haber": 0
+    },
+    "mantenimiento": {
+      "debe": 104000,
+      "haber": 0
+    },
+    "maquinaria_equipo": {
+      "debe": 3480000,
+      "haber": 0
+    },
+    "mobiliario_oficina": {
+      "debe": 255000,
+      "haber": 0
+    },
+    "otros_gastos": {
+      "debe": 57000,
+      "haber": 0
+    },
+    "perdidas_extraordinarias": {
+      "debe": 38000,
+      "haber": 0
+    },
+    "porcion_corriente_deuda": {
+      "debe": 0,
+      "haber": 250000
+    },
+    "prestamo_lp": {
+      "debe": 0,
+      "haber": 1600000
+    },
+    "publicidad": {
+      "debe": 215000,
+      "haber": 0
+    },
+    "seguros": {
+      "debe": 70000,
+      "haber": 0
+    },
+    "servicios_publicos": {
+      "debe": 131000,
+      "haber": 0
+    },
+    "sueldos_administrativos": {
+      "debe": 566000,
+      "haber": 0
+    },
+    "sueldos_ventas": {
+      "debe": 488000,
+      "haber": 0
+    },
+    "terrenos": {
+      "debe": 650000,
+      "haber": 0
+    },
+    "utilidades_retenidas": {
+      "debe": 0,
+      "haber": 1976250
+    },
+    "valores_negociables": {
+      "debe": 60000,
+      "haber": 0
+    },
+    "ventas_brutas": {
+      "debe": 0,
+      "haber": 9540000
+    }
+  },
+  "cuentas_2024": {
+    "ventas_brutas": 8750000,
+    "devoluciones_ventas": 175000,
+    "costo_materiales": 3430000,
+    "mano_obra_directa": 1286000,
+    "costos_indirectos": 857000,
+    "sueldos_administrativos": 520000,
+    "sueldos_ventas": 430000,
+    "publicidad": 172000,
+    "arrendamientos": 144000,
+    "servicios_publicos": 118000,
+    "seguros": 64000,
+    "mantenimiento": 86000,
+    "honorarios_profesionales": 52000,
+    "fletes_distribucion": 215000,
+    "otros_gastos": 48000,
+    "gasto_depreciacion": 330000,
+    "gasto_amortizacion": 40000,
+    "ingresos_financieros": 18000,
+    "gastos_intereses": 165000,
+    "perdidas_extraordinarias": 25000,
+    "isr_periodo": 152750,
+    "dividendos_decretados": 183000,
+    "caja_bancos": 437250,
+    "valores_negociables": 120000,
+    "cxc_comerciales": 1060000,
+    "estimacion_incobrables": 32000,
+    "inv_materia_prima": 445000,
+    "inv_en_proceso": 150000,
+    "inv_terminados": 560000,
+    "gastos_anticipados": 65000,
+    "terrenos": 650000,
+    "edificios": 1800000,
+    "maquinaria_equipo": 2850000,
+    "equipo_transporte": 480000,
+    "mobiliario_oficina": 230000,
+    "depreciacion_acumulada": 2280000,
+    "activos_intangibles": 350000,
+    "amortizacion_acumulada": 150000,
+    "inversiones_lp": 250000,
+    "cxp_proveedores": 655000,
+    "documentos_por_pagar": 350000,
+    "gastos_acumulados": 198000,
+    "isr_por_pagar": 110000,
+    "porcion_corriente_deuda": 200000,
+    "dividendos_por_pagar": 46000,
+    "prestamo_lp": 1250000,
+    "bonos_por_pagar": 800000,
+    "capital_comun": 1000000,
+    "capital_pagado_exceso": 400000,
+    "utilidades_retenidas": 1976250
+  },
+  "cuentas_2023": {
+    "caja_bancos": 310000,
+    "valores_negociables": 150000,
+    "cxc_comerciales": 980000,
+    "estimacion_incobrables": 29000,
+    "inv_materia_prima": 410000,
+    "inv_en_proceso": 140000,
+    "inv_terminados": 520000,
+    "gastos_anticipados": 60000,
+    "terrenos": 650000,
+    "edificios": 1800000,
+    "maquinaria_equipo": 2600000,
+    "equipo_transporte": 420000,
+    "mobiliario_oficina": 210000,
+    "depreciacion_acumulada": 1950000,
+    "activos_intangibles": 320000,
+    "amortizacion_acumulada": 110000,
+    "inversiones_lp": 250000,
+    "cxp_proveedores": 610000,
+    "documentos_por_pagar": 300000,
+    "gastos_acumulados": 185000,
+    "isr_por_pagar": 95000,
+    "porcion_corriente_deuda": 200000,
+    "dividendos_por_pagar": 40000,
+    "prestamo_lp": 1400000,
+    "bonos_por_pagar": 800000,
+    "capital_comun": 1000000,
+    "capital_pagado_exceso": 400000,
+    "utilidades_retenidas": 1701000
+  },
+  "complementarios": {
+    "acciones": 200000,
+    "valor_nominal": 5.0,
+    "tasa_isr": 25.0,
+    "dias_anio": 360,
+    "garrafones_unidades": 1160000,
+    "garrafones_precio": 4.5,
+    "cubetas_unidades": 480000,
+    "cubetas_precio": 9.0,
+    "precio_accion": 0
+  },
+  "industria": {
+    "margen_utilidad": 4.5,
+    "roa": 5.5,
+    "roe": 11.5,
+    "rotacion_cxc": 8.0,
+    "ppc": 45,
+    "rotacion_inventario": 7.0,
+    "rotacion_activos_fijos": 2.4,
+    "rotacion_activos_totales": 1.25,
+    "razon_circulante": 1.9,
+    "razon_rapida": 1.1,
+    "deuda_activos": 50,
+    "rotacion_interes": 4.5,
+    "cobertura_cargos_fijos": 3.0
+  }
+}
